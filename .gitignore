@@ -1,0 +1,43 @@
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+
+# Quarkus projects - target directories
+quarkus-playground-updstream/target/
+quarkus-playground-downstream/target/
+
+# Maven
+target/
+*.jar
+*.war
+*.ear
+*.class
+
+# Logs
+*.log
+logs/
+
+# Performance test outputs
+k6-output-*.json
+k6-report-*.html
+k6-upstream-*.json
+
+# All k6 output files (too large for versioning)
+k6/output/*.json
+k6/*.json
+
+# Performance test reports and data
+*.json
+!package.json
+!*.config.json
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# OS generated files
+Thumbs.db
+.DS_Store?
