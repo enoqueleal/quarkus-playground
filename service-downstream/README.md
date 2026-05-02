@@ -12,6 +12,182 @@ You can run your application in dev mode that enables live coding using:
 ./mvnw quarkus:dev
 ```
 
+## People API
+
+The application exposes a REST API for managing people records with full CRUD operations.
+
+### Endpoints
+
+#### Create a new person
+```http
+POST /people
+Content-Type: application/json
+
+{
+  "firstName": "João",
+  "lastName": "Silva"
+}
+```
+
+**Response:** `201 Created`
+```json
+{
+  "id": 1,
+  "firstName": "João",
+  "lastName": "Silva"
+}
+```
+
+#### Get all people
+```http
+GET /people
+```
+
+**Response:** `200 OK`
+```json
+[
+  {
+    "id": 1,
+    "firstName": "João",
+    "lastName": "Silva"
+  }
+]
+```
+
+#### Get person by ID
+```http
+GET /people/{id}
+```
+
+**Response:** `200 OK`
+```json
+{
+  "id": 1,
+  "firstName": "João",
+  "lastName": "Silva"
+}
+```
+
+**Response:** `404 Not Found` (if person doesn't exist)
+
+#### Update a person
+```http
+PUT /people/{id}
+Content-Type: application/json
+
+{
+  "firstName": "João",
+  "lastName": "Santos"
+}
+```
+
+**Response:** `200 OK`
+```json
+{
+  "id": 1,
+  "firstName": "João",
+  "lastName": "Santos"
+}
+```
+
+**Response:** `404 Not Found` (if person doesn't exist)
+
+#### Delete a person
+```http
+DELETE /people/{id}
+```
+
+**Response:** `204 No Content`
+
+**Response:** `404 Not Found` (if person doesn't exist)
+
+### Testing with cURL
+
+You can test the endpoints using cURL:
+
+```bash
+# Create a new person
+curl -X POST http://localhost:8080/people \
+  -H "Content-Type: application/json" \
+  -d '{"firstName": "João", "lastName": "Silva"}'
+
+# Get all people
+curl http://localhost:8080/people
+
+# Get person by ID
+curl http://localhost:8080/people/1
+
+# Update a person
+curl -X PUT http://localhost:8080/people/1 \
+  -H "Content-Type: application/json" \
+  -d '{"firstName": "João", "lastName": "Santos"}'
+
+# Delete a person
+curl -X DELETE http://localhost:8080/people/1
+```
+
+### Running the Test Suite
+
+The application includes a comprehensive test suite using JUnit 5, REST Assured, and H2 in-memory database.
+
+#### Run all tests
+```shell script
+./mvnw test
+```
+
+#### Run only PeopleController tests
+```shell script
+./mvnw test -Dtest=PeopleControllerTest
+```
+
+#### Test Coverage
+
+The test suite covers:
+- ✅ Create person (success)
+- ✅ Get all people (success)
+- ✅ Get person by ID (success and not found)
+- ✅ Update person (success and not found)
+- ✅ Delete person (success and not found)
+- ✅ Create multiple people
+- ✅ Input validation (missing body)
+
+**Test Results:**
+```
+Tests run: 12, Failures: 0, Errors: 0, Skipped: 0
+```
+
+### Database Configuration
+
+#### Production (PostgreSQL)
+- **Database:** PostgreSQL
+- **Schema:** `quarkus-playground`
+- **DDL Strategy:** update
+- **Connection:** Configured via docker-compose
+
+#### Test (H2)
+- **Database:** H2 in-memory
+- **DDL Strategy:** drop-and-create
+- **Profile:** test
+- **Auto-configured** for isolated testing
+
+### Docker Setup
+
+The application is configured to run with PostgreSQL using Docker Compose:
+
+```bash
+# Start all services (including PostgreSQL)
+docker compose up -d
+
+# Rebuild and restart the downstream service
+docker compose build --no-cache quarkus-downstream
+docker compose up -d quarkus-downstream
+```
+
+**Services:**
+- `quarkus-downstream`: Main application (port 8080)
+- `postgres`: PostgreSQL database (port 5432)
+- `pgadmin`: Database management UI (port 5050)
+
 ## Running the Gatling test for the random names endpoint
 
 For the simplest end-to-end execution, use the helper script:

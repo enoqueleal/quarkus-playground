@@ -26,7 +26,7 @@ services:
     environment:
       - DOWNSTREAM_URL=http://quarkus-downstream:8080
     ports:
-      - 8081:8080
+      - 8081:8081
     deploy:
       resources:
         limits:
@@ -37,16 +37,55 @@ services:
           memory: 512M
 
   quarkus-upstream-camel:
-    depends_on:
-      - quarkus-downstream
-    build:
-      context: ./service-upstream-camel
-      dockerfile: src/main/docker/Dockerfile.jvm
-    container_name: service-upstream-camel-container
+     depends_on:
+       - quarkus-downstream
+     build:
+       context: ./service-upstream-camel
+       dockerfile: src/main/docker/Dockerfile.jvm
+     container_name: service-upstream-camel-container
+     environment:
+       - DOWNSTREAM_URL=http://quarkus-downstream:8080
+     ports:
+       - 8082:8082
+     deploy:
+       resources:
+         limits:
+           cpus: '1.0'
+           memory: 1G
+         reservations:
+           cpus: '0.5'
+           memory: 512M
+
+  # pgadmin:
+  #   image: dpage/pgadmin4:latest
+  #   container_name: pgadmin-container
+  #   environment:
+  #     - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+  #     - PGADMIN_DEFAULT_PASSWORD=admin
+  #   ports:
+  #     - 5050:80
+  #   depends_on:
+  #     - postgres
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: '0.5'
+  #         memory: 512M
+  #       reservations:
+  #         cpus: '0.25'
+  #         memory: 256M
+
+  postgres:
+    image: postgres:16
+    container_name: postgres-container
     environment:
-      - DOWNSTREAM_URL=http://quarkus-downstream:8080
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=quarkus
     ports:
-      - 8082:8082
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     deploy:
       resources:
         limits:
@@ -55,3 +94,7 @@ services:
         reservations:
           cpus: '0.5'
           memory: 512M
+
+
+volumes:
+  postgres_data:

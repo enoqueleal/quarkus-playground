@@ -2,6 +2,7 @@ package br.com.playground.camel;
 
 import br.com.playground.model.RandomNamesResponse;
 import br.com.playground.service.RandomNamesService;
+import br.com.playground.service.PeopleService;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -12,6 +13,9 @@ public class CamelRoutes extends RouteBuilder {
 
     @Inject
     RandomNamesService randomNamesService;
+
+    @Inject
+    PeopleService peopleService;
 
     @Override
     public void configure() throws Exception {
@@ -36,6 +40,11 @@ public class CamelRoutes extends RouteBuilder {
                 .get("/random-names-cached")
                 .to("direct:random-names-cached");
 
+        // People endpoint (calls downstream service)
+        rest("/api")
+                .get("/people")
+                .to("direct:people");
+
         // Health check route
         from("direct:health-check")
                 .setBody(constant("{\"status\":\"up\",\"architecture\":\"camel\"}"))
@@ -53,5 +62,12 @@ public class CamelRoutes extends RouteBuilder {
                 .bean(RandomNamesService.class, "getCachedResponse")
                 .setHeader("X-Processed-By", constant("Apache-Camel"))
                 .setHeader("X-Route-ID", constant("camel-random-names-cached-route"));
+
+        // People route
+        from("direct:people")
+                .bean(PeopleService.class, "getAllPeople")
+                .setHeader("X-Processed-By", constant("Apache-Camel"))
+                .setHeader("X-Route-ID", constant("camel-people-route"));
     }
+
 }

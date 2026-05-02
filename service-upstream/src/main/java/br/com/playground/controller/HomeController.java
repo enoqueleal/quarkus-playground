@@ -1,6 +1,7 @@
 package br.com.playground.controller;
 
 import br.com.playground.service.RandomNamesService;
+import br.com.playground.service.PeopleService;
 import br.com.playground.model.Status;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -15,6 +16,9 @@ public class HomeController {
 
     @Inject
     RandomNamesService randomNamesService;
+
+    @Inject
+    PeopleService peopleService;
 
     @GET
     public Response home() {
@@ -31,6 +35,12 @@ public class HomeController {
     @Path("/random-names-cached")
     public Response randomNamesCached() {
         return Response.ok(randomNamesService.getCachedResponse()).build();
+    }
+
+    @GET
+    @Path("/people")
+    public Response getPeople() {
+        return Response.ok(peopleService.getAllPeople()).build();
     }
 
 }

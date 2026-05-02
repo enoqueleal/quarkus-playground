@@ -1,12 +1,16 @@
 package br.com.playground.service;
 
 import br.com.playground.model.RandomNamesResponse;
+import br.com.playground.model.People;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import java.util.List;
 
 @ApplicationScoped
 public class DownstreamService {
@@ -25,6 +29,23 @@ public class DownstreamService {
 
             if (response.getStatus() == 200) {
                 return response.readEntity(RandomNamesResponse.class);
+            } else {
+                throw new RuntimeException("Failed to call downstream service: " + response.getStatus());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error calling downstream service", e);
+        }
+    }
+
+    public List<People> getPeopleFromDownstream() {
+        try {
+            Response response = client.target(downstreamUrl)
+                    .path("/people")
+                    .request(MediaType.APPLICATION_JSON)
+                    .get();
+
+            if (response.getStatus() == 200) {
+                return response.readEntity(new GenericType<List<People>>() {});
             } else {
                 throw new RuntimeException("Failed to call downstream service: " + response.getStatus());
             }
